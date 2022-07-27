@@ -4,7 +4,7 @@ import db from "./config/connection.js";
 // import questions from "./assist/questions.js";
 
 async function menu() {
-  return inquirer
+  await inquirer
     .prompt({
       type: "list",
       message:
@@ -45,24 +45,24 @@ function viewDepartments() {
   db.query("SELECT * FROM department", function (err, results) {
     console.table(results);
     console.log("------------------------");
-    restart();
   });
+  restart();
 }
 
 function viewRoles() {
   db.query("SELECT * FROM role", function (err, results) {
     console.table(results);
     console.log("------------------------");
-    restart();
   });
+  restart();
 }
 
 function viewEmployees() {
   db.query("SELECT * FROM employee", function (err, results) {
     console.table(results);
     console.log("------------------------");
-    restart();
   });
+  restart();
 }
 
 async function addDepo() {
@@ -86,7 +86,6 @@ async function addDepo() {
           console.log("Department has been created!");
           console.log("------------------------");
           viewDepartments();
-          restart();
         }
       );
     });
@@ -134,7 +133,6 @@ async function addRole() {
           console.log("------------------------");
           viewRoles();
           console.log("------------------------");
-          restart();
         }
       );
     });
@@ -194,7 +192,6 @@ async function addEmployee() {
           console.log("------------------------");
           viewEmployees();
           console.log("------------------------");
-          restart();
         }
       );
     });
@@ -210,9 +207,9 @@ async function restart() {
     .then((restart) => {
       if (restart.restart) {
         console.log("------------------------");
-        menu();
       }
     });
+  menu();
 }
 
 menu();
