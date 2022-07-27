@@ -1,7 +1,11 @@
 import inquirer from "inquirer";
 import db from "./config/connection.js";
-// import table from "console.table";
-// import questions from "./assist/questions.js";
+// import dbQuery from "./assist/queries.js";
+
+db.connect((err) => {
+  if (err) throw err;
+  menu();
+});
 
 async function menu() {
   await inquirer
@@ -41,28 +45,32 @@ async function menu() {
       }
     });
 }
-function viewDepartments() {
-  db.query("SELECT * FROM department", function (err, results) {
+
+async function viewDepartments() {
+  db.query("SELECT * FROM department", (err, results) => {
+    if (err) throw err;
     console.table(results);
     console.log("------------------------");
+    menu();
   });
-  restart();
 }
 
 function viewRoles() {
-  db.query("SELECT * FROM role", function (err, results) {
+  db.query("SELECT * FROM role", (err, results) => {
+    if (err) throw err;
     console.table(results);
     console.log("------------------------");
+    menu();
   });
-  restart();
 }
 
 function viewEmployees() {
-  db.query("SELECT * FROM employee", function (err, results) {
+  db.query("SELECT * FROM employee", (err, results) => {
+    if (err) throw err;
     console.table(results);
     console.log("------------------------");
+    menu();
   });
-  restart();
 }
 
 async function addDepo() {
@@ -197,19 +205,17 @@ async function addEmployee() {
     });
 }
 
-async function restart() {
-  await inquirer
-    .prompt({
-      type: "confirm",
-      message: "Would you like to do anything else?",
-      name: "restart",
-    })
-    .then((restart) => {
-      if (restart.restart) {
-        console.log("------------------------");
-      }
-    });
-  menu();
-}
-
-menu();
+// async function restart() {
+//   await inquirer
+//     .prompt({
+//       type: "confirm",
+//       message: "Would you like to do anything else?",
+//       name: "restart",
+//     })
+//     .then((restart) => {
+//       if (restart.restart) {
+//         console.log("------------------------");
+//       }
+//     });
+//   menu();
+// }
