@@ -1,9 +1,9 @@
 INSERT INTO department (name)
-VALUES  ("Sales/Marketing"),
-        ("Finance/Accounting"),
-        ("Customer Service/HR"), 
+VALUES  ("Sales and Marketing"),
+        ("Finance and Accounting"),
+        ("Human Resources"), 
         ("Research and Development"),
-        ("Production/Distribution");
+        ("Production and Distribution");
 
 INSERT INTO role (title, salary, department_id)
 VALUES  ("Head of Marketing", 120000.00, 1), 
@@ -19,12 +19,12 @@ VALUES  ("Head of Marketing", 120000.00, 1),
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES  ("Bob", "Bobson", 1, NULL),
-          ("Tim", "Timson", 1, 1),
-          ("Fred", "Fredrickson", 2, NULL),
-          ("Alex", "Alexander", 2, 2),
-          ("Sara", "Sarahdon", 3, NULL),
-          ("Betty", "Boop", 3, 3),
-          ("Casey", "Sextits", 4, NULL),
-          ("Preston", "Weenerton", 4, 4),
-          ("Barristan", "Hargrove", 5, NULL),
-          ("Sylon", "Forgefed", 5, 5);
+          ("Tim", "Timson", 2, 1),
+          ("Fred", "Fredrickson", 3, NULL),
+          ("Alex", "Alexander", 4, 3),
+          ("Sara", "Sarahdon", 5, NULL),
+          ("Betty", "Boop", 6, 5),
+          ("Casey", "Sextits", 7, NULL),
+          ("Preston", "Weenerton", 8, 7),
+          ("Barristan", "Hargrove", 9, NULL),
+          ("Sylon", "Forgefed", 10, 9);

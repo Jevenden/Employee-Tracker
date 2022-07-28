@@ -55,21 +55,27 @@ async function viewDepartments() {
 }
 
 function viewRoles() {
-  db.query("SELECT * FROM role", (err, results) => {
-    if (err) throw err;
-    console.table(results);
-    console.log("------------------------");
-    menu();
-  });
+  db.query(
+    "SELECT role.ID AS 'ID', role.title AS 'Title', department.name AS 'Department', role.salary AS 'Salary' FROM role JOIN department ON role.department_id = department.id;",
+    (err, results) => {
+      if (err) throw err;
+      console.table(results);
+      console.log("------------------------");
+      menu();
+    }
+  );
 }
 
 function viewEmployees() {
-  db.query("SELECT * FROM employee", (err, results) => {
-    if (err) throw err;
-    console.table(results);
-    console.log("------------------------");
-    menu();
-  });
+  db.query(
+    "SELECT a.id AS 'ID', a.first_name AS 'First Name', a.last_name AS 'Last Name', role.title AS 'Job Title', department.name AS 'Department', role.salary AS 'Salary', CONCAT(b.first_name, ' ', b.last_name) AS 'Manager' FROM employee a JOIN role ON a.role_id = role.id JOIN department ON role.department_id = department.id LEFT OUTER JOIN employee b ON a.manager_id = b.id;",
+    (err, results) => {
+      if (err) throw err;
+      console.table(results);
+      console.log("------------------------");
+      menu();
+    }
+  );
 }
 
 async function addDepo() {
