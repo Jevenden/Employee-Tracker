@@ -1,6 +1,5 @@
 import inquirer from "inquirer";
 import db from "./config/connection.js";
-// import dbQuery from "./assist/queries.js";
 
 db.connect((err) => {
   if (err) throw err;
@@ -138,7 +137,6 @@ async function addRole() {
         [userInput.title, userInput.salary, userInput.department_id],
         function (err, results) {
           console.log("Role has been created!");
-          console.log("------------------------");
           viewRoles();
           console.log("------------------------");
         }
@@ -197,25 +195,9 @@ async function addEmployee() {
         ],
         function (err, results) {
           console.log("Employee has been added!");
-          console.log("------------------------");
           viewEmployees();
           console.log("------------------------");
         }
       );
     });
 }
-
-// async function restart() {
-//   await inquirer
-//     .prompt({
-//       type: "confirm",
-//       message: "Would you like to do anything else?",
-//       name: "restart",
-//     })
-//     .then((restart) => {
-//       if (restart.restart) {
-//         console.log("------------------------");
-//       }
-//     });
-//   menu();
-// }
