@@ -1,6 +1,14 @@
 import inquirer from "inquirer";
 import db from "./config/connection.js";
 
+function dbQuery(sql) {
+  return new Promise((resolve, reject) => {
+    db.query(sql, (err, results) => {
+      err ? reject(err) : resolve(results);
+    });
+  });
+}
+
 db.connect((err) => {
   if (err) throw err;
   menu();
@@ -21,6 +29,7 @@ async function menu() {
         "Add a role",
         "Add an employee",
         "Update an employee role",
+        "Exit the program",
       ],
     })
     .then(function (userChoice) {
@@ -41,6 +50,13 @@ async function menu() {
       }
       if (userChoice.menu == "Add an employee") {
         addEmployee();
+      }
+      if (userChoice.menu == "Update an employee role") {
+        addEmployee();
+      }
+      if (userChoice.menu == "Exit the program") {
+        console.log("Program exited");
+        process.exit();
       }
     });
 }
@@ -105,6 +121,11 @@ async function addDepo() {
 }
 
 async function addRole() {
+  let departmentList = await dbQuery({
+    sql: "SELECT name FROM department",
+    rowsAsArray: true,
+  });
+  departmentList = departmentList.flat();
   await inquirer
     .prompt([
       {
@@ -131,10 +152,9 @@ async function addRole() {
       },
       {
         type: "list",
-        message:
-          "Into what department does the new role fit? 1: Sales/Marketing, 2: Finance/Accounting, 3: Customer Service/HR, 4: Research and Development, 5: Production/Distribution",
+        message: "Into what department does the new role fit?",
         name: "department_id",
-        choices: ["1", "2", "3", "4", "5"],
+        choices: departmentList,
       },
     ])
     .then(function (userInput) {
@@ -151,6 +171,16 @@ async function addRole() {
 }
 
 async function addEmployee() {
+  let roleList = await dbQuery({
+    sql: "SELECT title FROM role",
+    rowsAsArray: true,
+  });
+  roleList = roleList.flat();
+  let managerList = await dbQuery({
+    sql: "SELECT CONCAT(first_name, ' ', last_name) FROM employee WHERE manager_id is NULL",
+    rowsAsArray: true,
+  });
+  managerList = managerList.flat();
   await inquirer
     .prompt([
       {
@@ -177,20 +207,21 @@ async function addEmployee() {
       },
       {
         type: "list",
-        message:
-          "Into what department does the new employee fit? 1: Sales/Marketing, 2: Finance/Accounting, 3: Customer Service/HR, 4: Research and Development, 5: Production/Distribution",
+        message: "What will be the new employee's role?",
         name: "department_id",
-        choices: ["1", "2", "3", "4", "5"],
+        choices: roleList,
       },
       {
         type: "list",
-        message:
-          "Who will be the employee's new manager? 1: Sales/Marketing, 2: Finance/Accounting, 3: Customer Service/HR, 4: Research and Development, 5: Production/Distribution",
+        message: "Who will be the employee's new manager?",
         name: "manager_id",
-        choices: ["1", "2", "3", "4", "5"],
+        choices: managerList,
       },
     ])
     .then(function (userInput) {
+      const index = userInput.department_id.search(/[0-9]/);
+      const firstNum = Number(userInput.department_id[index]);
+      userInput.department_id = firstNum;
       db.query(
         "INSERT INTO employee(first_name, last_name, role_id, manager_id) values (?, ?, ?, ?)",
         [
