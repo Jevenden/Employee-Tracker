@@ -52,7 +52,7 @@ async function menu() {
         addEmployee();
       }
       if (userChoice.menu == "Update an employee role") {
-        addEmployee();
+        upEmployee();
       }
       if (userChoice.menu == "Exit the program") {
         console.log("Program exited");
@@ -61,7 +61,7 @@ async function menu() {
     });
 }
 
-async function viewDepartments() {
+function viewDepartments() {
   db.query("SELECT * FROM department", (err, results) => {
     if (err) throw err;
     console.table(results);
@@ -109,9 +109,10 @@ async function addDepo() {
     })
     .then(function (userInput) {
       db.query(
-        "INSERT INTO department(name) values (?)",
+        "INSERT INTO department (name) values (?)",
         [userInput.newDep],
         function (err, results) {
+          if (err) throw err;
           console.log("Department has been created!");
           console.log("------------------------");
           viewDepartments();
@@ -144,7 +145,7 @@ async function addRole() {
         message: "What is the expected salary for the role?",
         name: "salary",
         validate: function (salary) {
-          if (salary.length < 1) {
+          if ((salary = !Number)) {
             return console.log("Please enter a valid salary.");
           }
           return true;
@@ -157,11 +158,16 @@ async function addRole() {
         choices: departmentList,
       },
     ])
-    .then(function (userInput) {
+    .then(async function (userInput) {
+      let newRoleDepID = await dbQuery(
+        `SELECT id FROM department WHERE name = '${userInput.department_id}';`
+      );
+      newRoleDepID = newRoleDepID[0].id;
       db.query(
         "INSERT INTO role(title, salary, department_id) values (?, ?, ?)",
-        [userInput.title, userInput.salary, userInput.department_id],
+        [userInput.title, userInput.salary, newRoleDepID],
         function (err, results) {
+          if (err) throw err;
           console.log("Role has been created!");
           viewRoles();
           console.log("------------------------");
@@ -218,20 +224,70 @@ async function addEmployee() {
         choices: managerList,
       },
     ])
-    .then(function (userInput) {
-      const index = userInput.department_id.search(/[0-9]/);
-      const firstNum = Number(userInput.department_id[index]);
-      userInput.department_id = firstNum;
+    .then(async function (userInput) {
+      let newEmpRoleID = await dbQuery(
+        `SELECT id FROM role WHERE title = "${userInput.department_id}";`
+      );
+      newEmpRoleID = newEmpRoleID[0].id;
+      const manNameArr = userInput.manager_id.split(" ");
+      let newEmpManID = await dbQuery(
+        `SELECT id FROM employee WHERE first_name = '${manNameArr[0]}' AND last_name = '${manNameArr[1]}';`
+      );
+      newEmpManID = newEmpManID[0].id;
       db.query(
         "INSERT INTO employee(first_name, last_name, role_id, manager_id) values (?, ?, ?, ?)",
-        [
-          userInput.first_name,
-          userInput.last_name,
-          userInput.department_id,
-          userInput.manager_id,
-        ],
+        [userInput.first_name, userInput.last_name, newEmpRoleID, newEmpManID],
         function (err, results) {
+          if (err) throw err;
           console.log("Employee has been added!");
+          viewEmployees();
+          console.log("------------------------");
+        }
+      );
+    });
+}
+
+async function upEmployee() {
+  let empToUp = await dbQuery({
+    sql: "SELECT CONCAT(first_name, ' ', last_name) FROM employee",
+    rowsAsArray: true,
+  });
+  empToUp = empToUp.flat();
+  let newRole = await dbQuery({
+    sql: "SELECT title FROM role",
+    rowsAsArray: true,
+  });
+  newRole = newRole.flat();
+  await inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "Which employee do you wish to update?",
+        name: "empChoice",
+        choices: empToUp,
+      },
+      {
+        type: "list",
+        message: "What will the employee's new role be?",
+        name: "newEmpRole",
+        choices: newRole,
+      },
+    ])
+    .then(async function (userInput) {
+      let upEmpRoleID = await dbQuery(
+        `SELECT id FROM role WHERE title = '${userInput.newEmpRole}';`
+      );
+      upEmpRoleID = upEmpRoleID[0].id;
+      const empNameToArray = userInput.empChoice.split(" ");
+      let upEmpID = await dbQuery(
+        `SELECT id FROM employee WHERE first_name = '${empNameToArray[0]}' AND last_name = '${empNameToArray[1]}'`
+      );
+      upEmpID = upEmpID[0].id;
+      db.query(
+        `UPDATE employee SET role_id = '${upEmpRoleID}' WHERE id = '${upEmpID}';`,
+        function (err, results) {
+          if (err) throw err;
+          console.log("Role has been updated!");
           viewEmployees();
           console.log("------------------------");
         }
