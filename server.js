@@ -1,6 +1,8 @@
+// Necessary Imports
 import inquirer from "inquirer";
 import db from "./config/connection.js";
 
+// Async sql query
 function dbQuery(sql) {
   return new Promise((resolve, reject) => {
     db.query(sql, (err, results) => {
@@ -9,11 +11,13 @@ function dbQuery(sql) {
   });
 }
 
+// Standard query connect
 db.connect((err) => {
   if (err) throw err;
   menu();
 });
 
+// Primary function to bring up the menu of choices and call the related function based on user input
 async function menu() {
   await inquirer
     .prompt({
@@ -61,6 +65,7 @@ async function menu() {
     });
 }
 
+// Function to view departments
 function viewDepartments() {
   db.query("SELECT * FROM department", (err, results) => {
     if (err) throw err;
@@ -70,6 +75,7 @@ function viewDepartments() {
   });
 }
 
+// Function to view departments
 function viewRoles() {
   db.query(
     "SELECT role.ID AS 'ID', role.title AS 'Title', department.name AS 'Department', role.salary AS 'Salary' FROM role JOIN department ON role.department_id = department.id;",
@@ -82,6 +88,7 @@ function viewRoles() {
   );
 }
 
+// Function to view employees
 function viewEmployees() {
   db.query(
     "SELECT a.id AS 'ID', a.first_name AS 'First Name', a.last_name AS 'Last Name', role.title AS 'Job Title', department.name AS 'Department', role.salary AS 'Salary', CONCAT(b.first_name, ' ', b.last_name) AS 'Manager' FROM employee a JOIN role ON a.role_id = role.id JOIN department ON role.department_id = department.id LEFT OUTER JOIN employee b ON a.manager_id = b.id;",
@@ -94,6 +101,7 @@ function viewEmployees() {
   );
 }
 
+// Function to add a new department
 async function addDepo() {
   await inquirer
     .prompt({
@@ -121,6 +129,7 @@ async function addDepo() {
     });
 }
 
+// Function to add a new role
 async function addRole() {
   let departmentList = await dbQuery({
     sql: "SELECT name FROM department",
@@ -176,6 +185,7 @@ async function addRole() {
     });
 }
 
+// Function to add a new employee
 async function addEmployee() {
   let roleList = await dbQuery({
     sql: "SELECT title FROM role",
@@ -247,6 +257,7 @@ async function addEmployee() {
     });
 }
 
+// Function to update an existing employee
 async function upEmployee() {
   let empToUp = await dbQuery({
     sql: "SELECT CONCAT(first_name, ' ', last_name) FROM employee",
