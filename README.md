@@ -28,6 +28,6 @@ Afterwards, simply type "node server.js" from the command line within the projec
 
 Github Repo for this application: https://github.com/Jevenden/Employee-Tracker
 
-Demo Video: https://github.com/Jevenden/Employee-Tracker
+Demo Video: https://drive.google.com/file/d/1YaQgC_5IE2Faj-dMK_q71j6CmsFe_pTc/view
 
 ![EMP DB SS](https://user-images.githubusercontent.com/102879070/182046925-3b48f788-ada7-46e0-9544-45fee52f1cf7.png)
